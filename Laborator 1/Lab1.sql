@@ -164,3 +164,55 @@ CREATE VIEW AnimalulDeCompanie AS
 	INNER JOIN Animal a ON a.Stapan = C.ID_client;
 
 SELECT * FROM AnimalulDeCompanie;
+
+--CREAREA TRANZACTIILOR:
+--1. Modificati numele animalului clientului 3
+BEGIN TRY
+    BEGIN TRANSACTION
+
+    UPDATE Animal
+	SET Nume = 'Bob'
+	WHERE Stapan = 3;
+
+    COMMIT TRANSACTION
+	PRINT ('Tranzactia s-a efectuat cu succes');
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION
+    -- Print the error message
+    PRINT 'Tranzactia a esuat';
+    PRINT ERROR_MESSAGE();
+END CATCH
+
+--2. Adaugati un nou magazin 
+BEGIN TRY
+    BEGIN TRANSACTION
+
+    INSERT INTO Magazin(Nume, Adresa, Data_deschiderii, Servicii, Tabara_de_zi, Produse)
+	VALUES ('PetExpert', 'str.Alba-Iulia', '2025-09-09', 1, 1, 3);
+
+    COMMIT TRANSACTION
+	PRINT ('Tranzactia s-a efectuat cu succes');
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION
+    -- Print the error message
+    PRINT 'Tranzactia a esuat';
+    PRINT ERROR_MESSAGE();
+END CATCH
+
+--3. Modificati numele unei coloane
+BEGIN TRY
+    BEGIN TRANSACTION
+
+	EXEC sp_rename 'Tabara_de_zi.Capacitate_mxima',  'Capacitate_max', 'COLUMN';
+
+    COMMIT TRANSACTION
+	PRINT ('Tranzactia s-a efectuat cu succes');
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION
+    -- Print the error message
+    PRINT 'Tranzactia a esuat';
+    PRINT ERROR_MESSAGE();
+END CATCH
