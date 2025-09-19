@@ -216,3 +216,16 @@ BEGIN CATCH
     PRINT 'Tranzactia a esuat';
     PRINT ERROR_MESSAGE();
 END CATCH
+
+--2 useri și de acordat și retras drepturi diferite. Apoi vă logați cu loginul creat efectuând diverse operații(INSERT, SELECT, UPDATE, DELETE, ALTER)
+CREATE LOGIN alexandrina WITH PASSWORD = 'alexandrina04';
+CREATE LOGIN olivia WITH PASSWORD = 'olivia2';
+
+CREATE USER alexandrina_user FOR LOGIN alexandrina;
+CREATE USER olivia_user FOR LOGIN olivia;
+
+GRANT SELECT, INSERT, UPDATE ON Produs TO alexandrina_user;
+GRANT SELECT, INSERT, UPDATE ON Client TO alexandrina_user;
+GRANT SELECT, INSERT, UPDATE ON Animal TO alexandrina_user;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON Magazin TO olivia_user;
