@@ -1,4 +1,5 @@
 CREATE DATABASE PetShop; --Crearea bazei de date
+USE PetShop;
 
 --Cream tabelele
 CREATE TABLE Magazin (
