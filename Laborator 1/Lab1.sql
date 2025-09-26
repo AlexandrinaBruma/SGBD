@@ -230,3 +230,44 @@ GRANT SELECT, INSERT, UPDATE ON Client TO alexandrina_user;
 GRANT SELECT, INSERT, UPDATE ON Animal TO alexandrina_user;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON Magazin TO olivia_user;
+
+
+--CREAREA INDECSILOR
+--index 1:
+CREATE INDEX idx_nume_animal
+ON Animal(Nume);
+
+SELECT Nume FROM Animal WHERE Nume LIKE 'B%';
+
+--index 2:
+CREATE INDEX idx_nume_produs
+ON Produs(Nume);
+
+SELECT Nume FROM Produs WHERE Nume LIKE '%t';
+
+--index 3:
+CREATE INDEX idx_nume_serviciu
+ON Serviciu(Nume);
+
+SELECT s.Nume as Nume_Serviciu, m.Nume as Magazin FROM Serviciu S
+JOIN Magazin M ON m.Servicii = s.ID_serviciu
+WHERE s.Nume = 'Frizerie';
+
+
+--CRIPTAREA DATELOR
+USE PetShop
+--Crearea unei chei master
+--Cheia master asigura ierarhia criptarii
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = "ABC123";
+--Crearea unui certificat
+--Certificatele sunt folosite pentru a proteja cheile de criptare
+CREATE CERTIFICATE TDE_Certificate
+      WITH SUBJECT = 'Certificate for TDE';
+--Crearea unei chei de criptare
+-- adica crearea algoritmului de criptare
+CREATE DATABASE ENCRYPTION KEY
+WITH ALGORITHM = AES_256
+ENCRYPTION BY SERVER CERTIFICATE TDE_Certificate;
+--Aplicarea criptarii catre un tabel 
+ALTER TABLE Client
+SET ENCRYPTION ON;
