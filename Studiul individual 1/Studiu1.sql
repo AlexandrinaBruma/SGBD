@@ -72,6 +72,10 @@ ADD FOREIGN KEY (Animale) REFERENCES Animal(ID_animal);
 ALTER TABLE Animal
 ADD FOREIGN KEY (Stapan) REFERENCES Client(ID_client);
 
+--Adaugam constrangerile de integritate 
+ALTER TABLE Client
+ADD CONSTRAINT UQ_Email UNIQUE (Email);
+
 --Populam cu date baza de date
 INSERT INTO Client (Nume, Prenume, Telefon, Email, Adresa_resedintei)
 VALUES 
