@@ -120,12 +120,11 @@ VALUES
 
 INSERT INTO Magazin(Nume, Adresa, Data_deschiderii, Servicii, Tabara_de_zi, Produse)
 VALUES 
-	('PetExpert', 'str.Albisoara', '2019-05-06', 1, 1, 5),
-	('PetExpert', 'str.Albisoara', '2019-05-06', 2, 1, 6),
-	('ZooMaster', 'bd.Cuza-Voda', '2022-08-16', 5, 2, 5),
-	('ZooMaster', 'str.Cuza-Voda', '2022-08-16', 4, 2, 7),
-	('PetCare', 'str.Paris', '2023-12-05', 3, 1, 9);
-
+	('PetExpert', 'str.Albisoara', '2019-05-06', 1, 1, 1),
+	('PetExpert', 'str.Albisoara', '2019-05-06', 2, 1, 2),
+	('ZooMaster', 'bd.Cuza-Voda', '2022-08-16', 5, 2, 3),
+	('ZooMaster', 'str.Cuza-Voda', '2022-08-16', 4, 2, 4),
+	('PetCare', 'str.Paris', '2023-12-05', 3, 1, 5);
 
 --CREAM INTEROGARI
 --VEDERI:
