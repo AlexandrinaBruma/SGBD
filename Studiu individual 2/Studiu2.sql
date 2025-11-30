@@ -117,14 +117,13 @@ VALUES
 	('Butterfly Daycamp', 4, 15, '07:00', '20:00'), 
 	('Butterfly Daycamp', 5, 15, '07:00', '20:00');
 
-
 INSERT INTO Magazin(Nume, Adresa, Data_deschiderii, Servicii, Tabara_de_zi, Produse)
 VALUES 
 	('PetExpert', 'str.Albisoara', '2019-05-06', 1, 1, 5),
-	('PetExpert', 'str.Albisoara', '2019-05-06', 2, 1, 6),
+	('PetExpert', 'str.Albisoara', '2019-05-06', 2, 1, 1),
 	('ZooMaster', 'bd.Cuza-Voda', '2022-08-16', 5, 2, 5),
-	('ZooMaster', 'str.Cuza-Voda', '2022-08-16', 4, 2, 7),
-	('PetCare', 'str.Paris', '2023-12-05', 3, 1, 9);
+	('ZooMaster', 'str.Cuza-Voda', '2022-08-16', 4, 2, 3),
+	('PetCare', 'str.Paris', '2023-12-05', 3, 1, 2);
 
 
 --CREAM INTEROGARI
@@ -276,3 +275,137 @@ ENCRYPTION BY SERVER CERTIFICATE TDE_Certificate;
 ALTER TABLE Client
 SET ENCRYPTION ON;
 
+--STUDIU INDIVIDUAL NR.2:
+ALTER TABLE Serviciu
+DROP CONSTRAINT FK__Serviciu__Client__5629CD9C;
+
+ALTER TABLE Serviciu
+DROP COLUMN Client;
+
+CREATE TABLE Appointment (
+	Appointment_id INT PRIMARY KEY IDENTITY(1,1),
+	Serviciul INT FOREIGN KEY REFERENCES Serviciu(ID_serviciu) NOT NULL,
+	Animalul INT FOREIGN KEY REFERENCES Animal(ID_animal) NOT NULL,
+	Clientul INT FOREIGN KEY REFERENCES Client(ID_client) NOT NULL,
+	Ora_de_inceput TIME NOT NULL,
+	Ora_de_sfarsit TIME NOT NULL
+)
+
+ALTER TABLE Appointment
+ADD Data_programarii DATETIME;
+
+
+--Proceduri:
+CREATE PROCEDURE addAppointment 
+    @animal INT,
+    @client INT,
+    @serviciul INT,
+    @dataProgramarii DATETIME,
+    @oraInceput TIME,
+    @oraSfarsit TIME
+AS
+BEGIN
+    IF NOT EXISTS (
+		SELECT ID_serviciu FROM Serviciu 
+		WHERE ID_serviciu = @serviciul)
+    BEGIN
+        PRINT 'Nu s-a putut crea programarea. Serviciul introdus nu există.';
+        ROLLBACK;
+    END
+
+    IF NOT EXISTS (
+		SELECT ID_animal FROM Animal 
+		WHERE ID_animal = @animal)
+    BEGIN
+        PRINT 'Nu s-a putut crea programarea. Animalul introdus nu există.';
+        ROLLBACK;
+    END
+
+    INSERT INTO Appointment (Serviciul, Animalul, Clientul, Data_programarii, Ora_de_inceput, Ora_de_sfarsit)
+    VALUES (@serviciul, @animal, @client, @dataProgramarii, @oraInceput, @oraSfarsit);
+END;
+
+EXEC addAppointment (1, 1, 1, '2025/11/20','12:00', '13:00';
+SELECT * FROM Appointment;
+
+--FUNCTII 
+--Functii scalare:
+CREATE FUNCTION numberOfAppointments (
+	@animal INT
+)
+RETURNS INT
+AS
+BEGIN
+	DECLARE @numar INT 
+	SELECT @numar = COUNT(Animalul) FROM Appointment
+	WHERE Animalul = @animal
+    RETURN @numar
+END
+
+SELECT dbo.numberOfAppointments(1);
+
+--Functii inline ce returneaza un tabel:
+CREATE FUNCTION termenDeValabilitate
+  (@produs INT)
+RETURNS TABLE
+AS
+   	RETURN
+	SELECT 
+		Nume AS Nume_produs, 
+		DATEDIFF(MONTH, Data_producerii, Data_expirarii) AS termen_valabilitate 
+	FROM Produs
+	WHERE ID_produs = @produs;
+GO
+
+SELECT * FROM termenDeValabilitate(3);
+
+--Functii multi-statement
+CREATE FUNCTION informatiiAppointment
+	(@animal INT)
+RETURNS @Informatii TABLE 
+(
+	NumeAnimal NVARCHAR(30),
+    AppID INT,
+    Nume NVARCHAR(30),
+    Data_programarii DATETIME,
+    Durata INT
+)
+AS
+BEGIN
+	INSERT INTO @Informatii
+	SELECT
+		an.Nume AS numeleAnimalului,
+		a.Appointment_id,
+		s.Nume AS Serviciul,
+		a.Data_programarii,
+		DATEDIFF(HOUR, a.Ora_de_inceput, a.Ora_de_sfarsit) AS Durata
+	FROM Appointment a
+	JOIN Serviciu s ON s.ID_serviciu = a.Serviciul
+	JOIN Animal an ON an.ID_animal = a.Animalul
+	WHERE Animalul = @animal;
+RETURN
+END
+
+SELECT * FROM informatiiAppointment(1);
+
+--TRIGGERE
+CREATE TRIGGER trigger_programariTrecute 
+ON Appointment
+AFTER INSERT
+AS
+BEGIN
+  IF EXISTS (
+        SELECT *
+        FROM inserted
+        WHERE Data_programarii < GETDATE()
+  )
+    BEGIN
+        RAISERROR('Data introdusa este invalida.', 16, 1);
+        ROLLBACK;
+    END
+END;
+
+SELECT * FROM Appointment
+INSERT INTO Appointment (Serviciul, Animalul, Clientul, Data_programarii, Ora_de_inceput, Ora_de_sfarsit)
+VALUES
+	(2, 2, 2, '2025/11/20', '11:00', '12:00')
